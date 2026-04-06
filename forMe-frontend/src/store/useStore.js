@@ -67,7 +67,9 @@ const useStore = create((set, get) => ({
 
   saveDayTimetable: async (date, tasks) => {
     try {
-      const res = await axios.post(`${API_BASE}/timetable`, { date, tasks });
+      console.log("Saving timetable for:", date, "with tasks:", tasks);
+      const res = await axios.post(`${API_BASE}/timetable`, { date, tasks, userId: 'me' });
+      console.log("Successfully saved timetable:", res.data);
       const { currentMonthData } = get();
       const index = currentMonthData.findIndex(t => t.date === date);
       let newData = [...currentMonthData];
@@ -79,7 +81,7 @@ const useStore = create((set, get) => ({
       set({ currentMonthData: newData });
       return res.data;
     } catch (err) {
-      console.error("Error saving day timetable:", err);
+      console.error("Error saving day timetable:", err.response?.data || err.message);
     }
   },
 
