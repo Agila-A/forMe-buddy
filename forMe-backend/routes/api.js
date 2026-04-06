@@ -17,19 +17,23 @@ router.get('/timetable/:date', async (req, res) => {
 
 router.post('/timetable', async (req, res) => {
   const { date, tasks } = req.body;
+  console.log("Incoming Timetable Data:", { date, tasks });
   try {
     let timetable = await Timetable.findOne({ userId: 'me', date });
     if (timetable) {
       timetable.tasks = tasks;
       timetable.markModified('tasks');
       const updatedTimetable = await timetable.save();
+      console.log("Timetable Updated ✅");
       res.json(updatedTimetable);
     } else {
       const newTimetable = new Timetable({ userId: 'me', date, tasks });
       const savedTimetable = await newTimetable.save();
+      console.log("New Timetable Created ✅");
       res.json(savedTimetable);
     }
   } catch (err) {
+    console.error("Timetable Save Error ❌:", err.message);
     res.status(400).json({ message: err.message });
   }
 });
@@ -170,10 +174,10 @@ router.get('/dashboard', async (req, res) => {
     }
 
     res.json({
-      totalStudyHours: (totalStudyMinutes / 60).toFixed(1),
-      sessionsCompleted: completedSessions,
+      totalHours: (totalStudyMinutes / 60).toFixed(1),
+      completedSessions: completedSessions,
       missedSessions: missedSessions,
-      consistencyScore: consistencyScore.toFixed(0),
+      consistency: consistencyScore.toFixed(0),
       streak: streakCount,
     });
   } catch (err) {
